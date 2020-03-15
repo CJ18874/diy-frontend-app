@@ -1,0 +1,241 @@
+﻿import React, { useState, useEffect, useCallback } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import * as projectAction from '../store/actions/projectAction';
+import { withStyles } from '@material-ui/core/styles';
+import Grid from '@material-ui/core/Grid';
+import Box from '@material-ui/core/Box';
+import Card from '@material-ui/core/Card';
+import CardHeader from '@material-ui/core/CardHeader';
+import CardContent from '@material-ui/core/CardContent';
+import CardActions from '@material-ui/core/CardActions';
+import Typography from '@material-ui/core/Typography';
+import Favorite from '@material-ui/icons/Favorite';
+import Button from '@material-ui/core/Button';
+import Avatar from '@material-ui/core/Avatar';
+import pink from '@material-ui/core/colors/pink';
+import green from '@material-ui/core/colors/green';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import Description from '@material-ui/icons/Description';
+import Chapter from '../components/Chapter';
+
+const styles = theme => ({
+    root: {
+        flexGrow: 1,
+    },
+    card: {
+        borderRadius: '12px',
+        border: '1.5px solid',
+    },
+    pinkAvatar: {
+        color: '#fff',
+        backgroundColor: pink[500],
+    },
+    greenAvatar: {
+        color: '#fff',
+        backgroundColor: green[500],
+    },
+    green: {
+        color: green[500],
+    },
+});
+
+function Project(props) {
+
+    const { classes } = props;
+
+    const dispatch = useDispatch();
+    const getProject = useCallback((projectId) => dispatch(projectAction.getProject(projectId)), [dispatch]);
+    useEffect(() => getProject(projectId), [getProject, projectId]);
+
+    let key = props.location.state.key;
+    let projectId = key.split('%')[2];
+
+    // In your component you'll still recieve a `ref`, but it will be a callback function instead of a Ref Object
+    // A custom Hook is a JavaScript function whose name starts with ”use” and that may call other Hook
+    function useHookWithRefCallback() {
+        const [node, setRef] = useState(null)
+
+        useEffect(
+            () => {
+                if (node) {
+                    // Your Hook now has a reference to the ref element.
+                    if (node.offsetWidth < node.scrollWidth) {
+                        if (node.id === 'descTextId') {
+                            setDescButtonText('Read More');
+                        }
+                        if (node.id === 'inspTextId') {
+                            setInspButtonText('Read More');
+                        }
+                    } else {
+                        node.style.padding = '12px';
+                    }
+                }
+            },
+            [node],
+        )
+        return [setRef]
+    }
+
+
+    // Description
+    const [descNoWrap, setDescNoWrap] = useState(true);
+    const [descButtonText, setDescButtonText] = useState('');
+    const [descRef] = useHookWithRefCallback();
+
+    function handleDescExpandClick() {
+        if (descButtonText === 'Read More') {
+            setDescButtonText('Read Less');
+            setDescNoWrap(false);
+        } else {
+            setDescButtonText('Read More');
+            setDescNoWrap(true);
+        }
+    }
+
+    // Insperation
+    const [inspNoWrap, setInspNoWrap] = useState(true);
+    const [inspButtonText, setInspButtonText] = useState('');
+    const [inspRef] = useHookWithRefCallback();
+
+    function handleInspExpandClick() {
+        if (inspButtonText === 'Read More') {
+            setInspButtonText('Read Less');
+            setInspNoWrap(false);
+        } else {
+            setInspButtonText('Read More');
+            setInspNoWrap(true);
+        }
+    }
+
+    const [raised, setRaised] = useState({
+        descCard: false,
+        inspCard: false
+    });
+
+    const onMouseEnter = (e) => {
+        if (e.currentTarget.id === 'descCard') {
+            let id = e.currentTarget.id;
+            setRaised(prevState => ({
+                ...prevState,     // keep all other key-value pairs
+                [id]: true       // update the value of specific key
+            }));
+        } else {
+            setRaised(prevState => ({ ...prevState, ['inspCard']: true }));
+        }
+    }
+    const onMouseLeave = (e) => {
+        if (e.currentTarget.id === 'descCard') {
+            setRaised(prevState => ({ ...prevState, ['descCard']: false }));
+        } else {
+            setRaised(prevState => ({ ...prevState, ['inspCard']: false }));
+        }
+    }
+
+    const error = useSelector(state => state.project.error);
+    const isLoading = useSelector(state => state.project.isLoading);
+    const data = useSelector(state => state.project.data);
+    if (error) {
+        return <p>Sorry! There was an error loading the items</p>;
+    }
+    if (isLoading) {
+        return <CircularProgress />;
+    }
+
+    return (
+        <div>
+            <Box m={2} >
+                <Typography
+                    variant="h2"
+                    align="center"
+                    style={{ fontWeight: 700, textTransform: 'uppercase' }}>
+                    {data.title}
+                </Typography>
+            </Box>
+            <div style={{ padding: 20 }}>
+                <Grid container spacing={3}>
+                    <Grid item xs={6}>
+                        <Card
+                            id="descCard"
+                            style={{ borderColor: green[500] }}
+                            className={classes.card}
+                            onMouseEnter={onMouseEnter}
+                            onMouseLeave={onMouseLeave}
+                            raised={raised.descCard}>
+                            <CardHeader
+                                classes={{
+                                    avatar: classes.MuiCardHeaderAvatar
+                                }}
+                                avatar={
+                                    <Avatar
+                                        className={classes.greenAvatar}>
+                                        <Description />
+                                    </Avatar>
+                                }
+                                title={<Typography variant="h6" className={classes.green}>Description</Typography>}
+                            >
+                            </CardHeader>
+                            <CardContent>
+                                <Typography id="descTextId" ref={descRef} noWrap={descNoWrap} variant="h5">
+                                    {data.description}
+                                </Typography>
+                            </CardContent>
+                            <CardActions id="descCardActions">
+                                <Button
+                                    id="descButton"
+                                    style={{ textTransform: 'capitalize' }}
+                                    disabled={descButtonText === '' ? true : false}
+                                    size="small"
+                                    color="primary"
+                                    onClick={handleDescExpandClick}>
+                                    {descButtonText}
+                                </Button>
+                            </CardActions>
+                        </Card>
+                    </Grid>
+                    <Grid item xs={6}>
+                        <Card
+                            id="inspCard"
+                            style={{ borderColor: pink[500] }}
+                            className={classes.card}
+                            onMouseEnter={onMouseEnter}
+                            onMouseLeave={onMouseLeave}
+                            raised={raised.inspCard}>
+                            <CardHeader
+                                classes={{
+                                    avatar: classes.MuiCardHeaderAvatar
+                                }}
+                                avatar={
+                                    <Avatar aria-label="Recipe" className={classes.pinkAvatar}>
+                                        <Favorite />
+                                    </Avatar>
+                                }
+                                title={<Typography variant="h6" color='secondary'>Insperation</Typography>}
+                            >
+                            </CardHeader>
+                            <CardContent id="inspContentId">
+                                <Typography id="inspTextId" ref={inspRef} noWrap={inspNoWrap} variant="h5">
+                                    {data.insperation}
+                                </Typography>
+                            </CardContent>
+                            <CardActions id="inspActionId">
+                                <Button
+                                    id="inspButton"
+                                    style={{ textTransform: 'capitalize' }}
+                                    disabled={inspButtonText === '' ? true : false}
+                                    size="small"
+                                    color="primary"
+                                    onClick={handleInspExpandClick}>
+                                    {inspButtonText}
+                                </Button>
+                            </CardActions>
+                        </Card>
+                    </Grid>
+                </Grid >
+                <Box component="span" m={1} />
+                <Chapter projectId={projectId} />
+            </div>
+        </div >
+    );
+}
+
+export default withStyles(styles, { withTheme: true })(Project);
