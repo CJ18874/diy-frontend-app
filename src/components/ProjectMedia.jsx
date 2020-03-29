@@ -15,7 +15,7 @@ import yellow from '@material-ui/core/colors/yellow';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import '@material/react-card/dist/card.css';
-import { Spring } from 'react-spring/renderprops';
+import { Spring } from 'react-spring/renderprops.cjs';
 
 // Inject some CSS into the DOM.
 //Material-UI uses a JavaScript-based approach to theming its components called CSS-in-JS. 

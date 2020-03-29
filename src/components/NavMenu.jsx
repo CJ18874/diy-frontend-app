@@ -28,7 +28,7 @@ const styles = theme => ({
     },
 });
 
-class NavMenu extends Component {
+export class NavMenu extends Component {
     displayName = NavMenu.name
 
     state = {
@@ -97,13 +97,14 @@ class NavMenu extends Component {
 
 const mapStateToProps = (state) => {
     return {
-        //isLoading: state.project.isLoading,
+        isLoading: state.projects.isLoading,
     }
 }
+
 
 NavMenu.propTypes = {
     classes: PropTypes.object.isRequired,
     //isLoading: PropTypes.bool.isRequired
 };
 
-export default connect(mapStateToProps, null)(withStyles(styles)(NavMenu));
+export default connect(mapStateToProps)(withStyles(styles)(NavMenu));
