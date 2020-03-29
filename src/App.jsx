@@ -16,7 +16,7 @@ function App() {
                 <Route path="/wind-instruments" component={ProjectList} />
                 <Route path="/percussion-instruments" component={ProjectList} />
                 <Route path="/electronic-gear" component={ProjectList} />
-                <Route path="/signinn" component={SignIn} />
+                <Route path="/signin" component={SignIn} />
             </Layout>
         </div>
     );
