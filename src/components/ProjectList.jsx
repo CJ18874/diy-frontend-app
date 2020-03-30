@@ -30,7 +30,8 @@ class ProjectList extends Component {
 
     render() {
         let listedProjects;
-        if (this.props.data.length > 0) {
+        if (this.props.data && this.props.data.length > 0) {
+            console.log('this.props', this.props)
             listedProjects = this.props.data.map(element => {
                 return (
                     <Grid item xs={6} sm={3} key={element.id}>
